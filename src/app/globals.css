@@ -128,3 +128,21 @@
     @apply font-sans;
   }
 }
+html {
+  scroll-behavior: smooth;
+}
+
+body{
+  background:#050505;
+  color:white;
+}
+
+::selection{
+  background:#d4af37;
+  color:black;
+}
+:root{
+  --gold:#d4af37;
+  --dark:#050505;
+  --card:#101010;
+}
