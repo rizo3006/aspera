@@ -2,51 +2,52 @@ import Image from "next/image";
 
 export default function Hero() {
   return (
-    <section className="relative min-h-screen overflow-hidden bg-neutral-950 pt-20">
+    <section className="relative flex min-h-screen items-center overflow-hidden bg-black pt-20">
 
-      <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-transparent z-10" />
+      {/* Logo de fondo */}
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+        <Image
+          src="/images/logo.png"
+          alt="Aspera Logo"
+          width={700}
+          height={700}
+          className="opacity-[0.04] select-none"
+          priority
+        />
+      </div>
 
-      <Image
-        src="/images/hero.jpg"
-        alt="Hero"
-        fill
-        priority
-        className="object-cover object-center"
-      />
+      <div className="relative z-10 mx-auto flex max-w-7xl flex-col items-center px-6 text-center">
 
-      <div className="relative z-20 mx-auto flex min-h-screen max-w-7xl items-center px-6">
+        <p className="mb-5 text-sm uppercase tracking-[0.5em] text-amber-400">
+          ASPERA COLLECTION
+        </p>
 
-        <div className="max-w-2xl">
+        <h1 className="text-5xl font-black leading-tight md:text-8xl">
+          BUILT TO
+          <br />
+          GLORIFY
+        </h1>
 
-          <p className="mb-5 text-sm uppercase tracking-[0.5em] text-amber-400">
-            ASPERA COLLECTION
-          </p>
+        <p className="mt-8 max-w-xl text-zinc-400">
+          Calidad premium. Diseño minimalista.
+          Inspirado para quienes buscan algo más que ropa.
+        </p>
 
-          <h1 className="text-6xl font-black leading-none md:text-8xl">
-            BUILT
-            <br />
-            TO
-            <br />
-            GLORIFY
-          </h1>
+        <div className="mt-10 flex flex-wrap justify-center gap-4">
 
-          <p className="mt-8 max-w-lg text-lg text-zinc-300">
-            Diseños con identidad.
-            Calidad premium.
-            Pensados para personas que buscan algo más que ropa.
-          </p>
+          <a
+            href="/shop"
+            className="rounded-full bg-white px-8 py-4 font-semibold text-black transition hover:scale-105"
+          >
+            Comprar ahora
+          </a>
 
-          <div className="mt-10 flex flex-wrap gap-4">
-
-            <button className="rounded-full bg-white px-8 py-4 font-semibold text-black transition hover:scale-105">
-              Comprar ahora
-            </button>
-
-            <button className="rounded-full border border-white px-8 py-4 font-semibold transition hover:bg-white hover:text-black">
-              Ver colección
-            </button>
-
-          </div>
+          <a
+            href="/collections"
+            className="rounded-full border border-white px-8 py-4 font-semibold transition hover:bg-white hover:text-black"
+          >
+            Ver colección
+          </a>
 
         </div>
 
@@ -55,4 +56,3 @@ export default function Hero() {
     </section>
   );
 }
-    

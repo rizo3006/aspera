@@ -1,6 +1,7 @@
 import { Heart } from "lucide-react";
 import Image from "next/image";
 import { Product } from "@/data/products";
+import Link from "next/link";
 
 interface ProductCardProps {
   product: Product;
@@ -37,9 +38,12 @@ export default function ProductCard({ product }: ProductCardProps) {
             ${product.price}
           </span>
 
-          <button className="rounded-full bg-white px-5 py-2 text-sm font-semibold text-black transition hover:scale-105">
-            Comprar
-          </button>
+          <Link
+  href={`/shop/${product.slug}`}
+  className="rounded-full bg-white px-5 py-2 text-sm font-semibold text-black transition hover:scale-105"
+>
+  Ver producto
+</Link>
         </div>
       </div>
 
