@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { Product } from "@/data/products";
+import type { Product } from "@/types/product";
 
 interface CartItem extends Product {
   quantity: number;
@@ -9,8 +9,10 @@ interface CartStore {
   items: CartItem[];
 
   addToCart: (product: Product) => void;
+  removeFromCart: (id: Product["id"]) => void;
 
-  removeFromCart: (id: number) => void;
+  increaseQuantity: (id: Product["id"]) => void;
+  decreaseQuantity: (id: Product["id"]) => void;
 
   clearCart: () => void;
 }
@@ -37,9 +39,31 @@ export const useCartStore = create<CartStore>((set) => ({
       };
     }),
 
+  increaseQuantity: (id) =>
+    set((state) => ({
+      items: state.items.map((item) =>
+        item.id === id
+          ? { ...item, quantity: item.quantity + 1 }
+          : item
+      ),
+    })),
+
+  decreaseQuantity: (id) =>
+    set((state) => ({
+      items: state.items
+        .map((item) =>
+          item.id === id
+            ? {
+                ...item,
+                quantity: Math.max(1, item.quantity - 1),
+              }
+            : item
+        ),
+    })),
+
   removeFromCart: (id) =>
     set((state) => ({
-      items: state.items.filter((i) => i.id !== id),
+      items: state.items.filter((item) => item.id !== id),
     })),
 
   clearCart: () => set({ items: [] }),

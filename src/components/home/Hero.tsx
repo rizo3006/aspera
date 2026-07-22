@@ -4,19 +4,25 @@ import Stat from "@/components/common/Stat";
 
 export default function Hero() {
   return (
-    <section className="relative overflow-hidden bg-black">
+   <section className="relative overflow-hidden bg-black pb-12">
 
       <div className="absolute inset-0 bg-gradient-to-b from-zinc-900 via-black to-black" />
 
       {/* Logo como marca de agua */}
       <Image
-        src="/images/logo.png"
-        alt="ASPERA"
-        width={900}
-        height={900}
-        className="absolute -right-60 top-1/2 hidden -translate-y-1/2 opacity-10 lg:block"
-        priority
-      />
+  src="/images/logo.png"
+  alt="ASPERA"
+  width={900}
+  height={900}
+  className="
+    absolute
+    right-0
+    top-1/2
+    -translate-y-1/2
+    opacity-[0.18]
+  "
+  priority
+/>
 
       <div className="relative mx-auto grid min-h-screen max-w-7xl items-center gap-20 px-6 pt-24 lg:grid-cols-2">
 
@@ -60,7 +66,7 @@ export default function Hero() {
 
           <div className="mt-20 grid grid-cols-3 gap-8">
 
-            <Stat number="100+" label="Productos" />
+            <Stat number="+50" label="Producto" />
             <Stat number="24/7" label="Soporte" />
             <Stat number="100%" label="Calidad" />
 
@@ -71,17 +77,25 @@ export default function Hero() {
         {/* Imagen principal */}
         <div className="relative flex justify-center">
 
-          <div className="relative h-[650px] w-[430px] overflow-hidden rounded-[40px] border border-white/10 bg-zinc-900 shadow-2xl">
+          <div className="relative flex h-[380px] w-[320px] items-center justify-center">
 
-            <Image
-              src="/images/hero/modelo.jpg"
-              alt="Modelo"
-              fill
-              className="object-cover"
-            />
+  {/* Resplandor */}
+  <div className="absolute h-[420px] w-[420px] rounded-full bg-amber-400/10 blur-3xl" />
 
-          </div>
+  {/* Círculo de fondo */}
+  <div className="absolute h-[420px] w-[420px] rounded-full border border-white/10 bg-gradient-to-br from-zinc-900 to-black shadow-[0_0_80px_rgba(255,255,255,.08)]" />
 
+  {/* Logo */}
+  <Image
+    src="/images/logo.png"
+    alt="ASPERA"
+    width={360}
+    height={360}
+    priority
+    className="relative z-10 transition duration-700 hover:scale-105"
+  />
+
+</div>
         </div>
 
       </div>

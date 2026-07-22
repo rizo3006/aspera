@@ -1,48 +1,56 @@
-export interface Product {
-  id: number;
-  name: string;
-  slug: string;
-  price: number;
-  image: string;
-  category: string;
-  featured: boolean;
-}
+import type { Product } from "@/types/product";
 
 export const products: Product[] = [
   {
-    id: 1,
-    name: "Playera Built To Glorify",
+    id: "1",
     slug: "playera-built-to-glorify",
+    name: "Playera Built To Glorify",
+    description: "Playera premium oversize.",
     price: 499,
-    image: "/products/shirt1.jpg",
+    comparePrice: 599,
     category: "Playeras",
+    images: ["/products/shirt1.jpg"],
     featured: true,
+    stock: 20,
+    rating: 5,
   },
   {
-    id: 2,
-    name: "Cadena Cross",
+    id: "2",
     slug: "cadena-cross",
-    price: 599,
-    image: "/products/chain1.jpg",
+    name: "Cadena Cross",
+    description: "Cadena premium de acero inoxidable.",
+    price: 529,
+    comparePrice: 649,
     category: "Cadenas",
+    images: ["/products/chain1.jpg"],
     featured: true,
+    stock: 15,
+    rating: 5,
   },
   {
-    id: 3,
-    name: "Pulsera Premium",
+    id: "3",
     slug: "pulsera-premium",
-    price: 349,
-    image: "/products/bracelet1.jpg",
-    category: "Pulseras",
+    name: "Pulsera Premium",
+    description: "Pulsera premium de acero.",
+    price: 449,
+    comparePrice: 549,
+    category: "Esclavas",
+    images: ["/products/bracelet1.jpg"],
     featured: true,
+    stock: 18,
+    rating: 5,
   },
   {
-    id: 4,
-    name: "Gorra Aspera",
+    id: "4",
     slug: "gorra-aspera",
+    name: "Gorra Aspera",
+    description: "Gorra premium.",
     price: 449,
-    image: "/products/cap1.jpg",
+    comparePrice: 549,
     category: "Accesorios",
+    images: ["/products/cap1.jpg"],
     featured: true,
+    stock: 12,
+    rating: 5,
   },
 ];
