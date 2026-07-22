@@ -25,7 +25,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         </button>
 
         <Image
-          src={product.images?.[0] || ""}
+          src={product.image || ""}
           alt={product.name}
           fill
           className="object-cover transition duration-500 group-hover:scale-110"
