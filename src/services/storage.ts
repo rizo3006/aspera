@@ -1,11 +1,32 @@
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import {
+  ref,
+  uploadBytes,
+  getDownloadURL,
+} from "firebase/storage";
+
 import { storage } from "@/firebase/config";
-import { v4 as uuid } from "uuid";
 
 export async function uploadImage(file: File) {
-  const imageRef = ref(storage, `products/${uuid()}-${file.name}`);
+  if (!file) {
+    throw new Error("No se seleccionó ninguna imagen");
+  }
 
-  await uploadBytes(imageRef, file);
+  const fileName = `${Date.now()}-${file.name}`;
 
-  return await getDownloadURL(imageRef);
+  const storageRef = ref(
+    storage,
+    `products/${fileName}`
+  );
+
+  console.log("Subiendo imagen:", file.name);
+
+  await uploadBytes(storageRef, file);
+
+  console.log("Imagen subida correctamente");
+
+  const url = await getDownloadURL(storageRef);
+
+  console.log("URL obtenida:", url);
+
+  return url;
 }

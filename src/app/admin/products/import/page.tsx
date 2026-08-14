@@ -101,91 +101,125 @@ export default function ImportProductsPage() {
   }
 
   async function handleImport() {
-    if (products.length === 0) {
-      toast.error("No hay productos");
+  if (products.length === 0) {
+    toast.error("No hay productos");
+    return;
+  }
+
+  for (const product of products) {
+    if (!product.name) {
+      toast.error("Falta el nombre de un producto");
       return;
     }
 
-    for (const product of products) {
-      if (
-        !product.name ||
-        !product.price ||
-        !product.imageFile
-      ) {
-        toast.error(
-          "Cada producto necesita nombre, precio e imagen"
-        );
-        return;
-      }
+    if (!product.price) {
+      toast.error(
+        `Falta el precio de ${product.name}`
+      );
+      return;
     }
 
-    setLoading(true);
-
-    try {
-      for (const product of products) {
-        const imageUrl = await uploadImage(
-          product.imageFile!
-        );
-
-        const slug =
-          product.slug ||
-          product.name
-            .toLowerCase()
-            .normalize("NFD")
-            .replace(/[\u0300-\u036f]/g, "")
-            .replace(/[^a-z0-9]+/g, "-")
-            .replace(/^-|-$/g, "");
-
-        await addDoc(collection(db, "products"), {
-          name: product.name,
-          slug,
-
-          description: product.description,
-
-          price: Number(product.price),
-
-          comparePrice: Number(
-            product.comparePrice || 0
-          ),
-
-          category: product.category,
-
-          type: product.type,
-
-          brand: product.brand,
-
-          gender: product.gender,
-
-          image: imageUrl,
-
-          featured: product.featured,
-
-          stock: Number(product.stock || 0),
-
-          rating: Number(product.rating || 5),
-        });
-      }
-
-      toast.success(
-        `${products.length} producto${
-          products.length === 1 ? "" : "s"
-        } agregado${
-          products.length === 1 ? "" : "s"
-        } correctamente`
-      );
-
-      setProducts([createProduct()]);
-    } catch (error) {
-      console.error(error);
-
+    if (!product.imageFile) {
       toast.error(
-        "No se pudieron subir los productos"
+        `Falta la imagen de ${product.name}`
       );
-    } finally {
-      setLoading(false);
+      return;
     }
   }
 
+  setLoading(true);
+
+  try {
+    console.log(
+      `Iniciando subida de ${products.length} productos`
+    );
+
+    for (let i = 0; i < products.length; i++) {
+      const product = products[i];
+
+      console.log(
+        `Subiendo producto ${i + 1}/${products.length}:`,
+        product.name
+      );
+
+      // Subir imagen
+      const imageUrl = await uploadImage(
+        product.imageFile!
+      );
+
+      console.log(
+        "Imagen subida:",
+        imageUrl
+      );
+
+      // Crear producto en Firestore
+      await addDoc(collection(db, "products"), {
+        name: product.name,
+
+        slug:
+          product.slug ||
+          product.name
+            .toLowerCase()
+            .trim()
+            .replace(/\s+/g, "-")
+            .replace(/[^\w-]/g, ""),
+
+        description: product.description,
+
+        price: Number(product.price),
+
+        comparePrice: Number(
+          product.comparePrice || 0
+        ),
+
+        category: product.category,
+
+        type: product.type,
+
+        brand: product.brand,
+
+        image: imageUrl,
+
+        featured: product.featured,
+
+        stock: Number(
+          product.stock || 0
+        ),
+
+        rating: Number(
+          product.rating || 5
+        ),
+      });
+
+      console.log(
+        `Producto ${i + 1} guardado correctamente`
+      );
+    }
+
+    toast.success(
+      `${products.length} producto${
+        products.length === 1 ? "" : "s"
+      } agregado${
+        products.length === 1 ? "" : "s"
+      } correctamente`
+    );
+
+    setProducts([createProduct()]);
+
+  } catch (error) {
+    console.error(
+      "ERROR AL SUBIR PRODUCTOS:",
+      error
+    );
+
+    toast.error(
+      "No se pudieron subir los productos. Revisa la consola."
+    );
+
+  } finally {
+    setLoading(false);
+  }
+}
   return (
     <main className="min-h-screen bg-black px-6 py-32 text-white">
 
