@@ -8,6 +8,7 @@ interface Props {
 const categories = [
   "Todos",
   "Playeras",
+  "Tenis",
   "Cadenas",
   "Esclavas",
   "Accesorios",

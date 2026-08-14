@@ -1,8 +1,48 @@
 "use client";
 
 import Link from "next/link";
+import { useProducts } from "@/hooks/useProducts";
 
 export default function AdminPage() {
+  const { products, loading } = useProducts();
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-black text-white">
+        Cargando...
+      </div>
+    );
+  }
+
+  const totalProducts = products.length;
+
+  const totalInventory = products.reduce(
+    (sum: number, product: any) =>
+      sum + product.price * product.stock,
+    0
+  );
+
+  const featuredProducts = products.filter(
+    (product: any) => product.featured
+  ).length;
+
+  const outOfStock = products.filter(
+    (product: any) => product.stock === 0
+  ).length;
+
+  const tenis = products.filter(
+    (product: any) => product.category === "Tenis"
+  ).length;
+
+  const playeras = products.filter(
+    (product: any) => product.category === "Playeras"
+  ).length;
+
+  const accesorios = products.filter(
+    (product: any) =>
+      product.category === "Accesorios"
+  ).length;
+
   return (
     <main className="min-h-screen bg-black px-8 py-36 text-white">
 
@@ -13,48 +53,108 @@ export default function AdminPage() {
         </h1>
 
         <p className="mt-4 text-zinc-400">
-          Administra todos los productos de ASPERA.
+          Bienvenido al panel de ASPERA.
         </p>
 
-        <div className="mt-12 grid gap-8 md:grid-cols-3">
+        <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+
+          <div className="rounded-3xl bg-zinc-900 p-8">
+            <p className="text-zinc-400">
+              Productos
+            </p>
+
+            <h2 className="mt-3 text-4xl font-black">
+              {totalProducts}
+            </h2>
+          </div>
+
+          <div className="rounded-3xl bg-zinc-900 p-8">
+            <p className="text-zinc-400">
+              Valor inventario
+            </p>
+
+            <h2 className="mt-3 text-4xl font-black">
+              ${totalInventory.toLocaleString()}
+            </h2>
+          </div>
+
+          <div className="rounded-3xl bg-zinc-900 p-8">
+            <p className="text-zinc-400">
+              Destacados
+            </p>
+
+            <h2 className="mt-3 text-4xl font-black">
+              {featuredProducts}
+            </h2>
+          </div>
+
+          <div className="rounded-3xl bg-zinc-900 p-8">
+            <p className="text-zinc-400">
+              Sin stock
+            </p>
+
+            <h2 className="mt-3 text-4xl font-black text-red-500">
+              {outOfStock}
+            </h2>
+          </div>
+
+        </div>
+
+        <div className="mt-10 grid gap-6 md:grid-cols-3">
+
+          <div className="rounded-3xl bg-zinc-900 p-8">
+            <p className="text-zinc-400">
+              👟 Tenis
+            </p>
+
+            <h2 className="mt-3 text-3xl font-black">
+              {tenis}
+            </h2>
+          </div>
+
+          <div className="rounded-3xl bg-zinc-900 p-8">
+            <p className="text-zinc-400">
+              👕 Playeras
+            </p>
+
+            <h2 className="mt-3 text-3xl font-black">
+              {playeras}
+            </h2>
+          </div>
+
+          <div className="rounded-3xl bg-zinc-900 p-8">
+            <p className="text-zinc-400">
+              🎒 Accesorios
+            </p>
+
+            <h2 className="mt-3 text-3xl font-black">
+              {accesorios}
+            </h2>
+          </div>
+
+        </div>
+
+        <div className="mt-14 grid gap-6 md:grid-cols-3">
 
           <Link
             href="/admin/products"
-            className="rounded-3xl border border-white/10 bg-zinc-900 p-8 transition hover:border-amber-500"
+            className="rounded-3xl bg-amber-500 p-8 text-center text-xl font-bold text-black transition hover:scale-105"
           >
-            <h2 className="text-2xl font-bold">
-              Productos
-            </h2>
-
-            <p className="mt-3 text-zinc-400">
-              Crear, editar y eliminar productos.
-            </p>
+            Administrar Productos
           </Link>
 
           <Link
-            href="/admin/orders"
-            className="rounded-3xl border border-white/10 bg-zinc-900 p-8 transition hover:border-amber-500"
+            href="/admin"
+            className="rounded-3xl bg-zinc-900 p-8 text-center text-xl font-bold transition hover:border hover:border-white"
           >
-            <h2 className="text-2xl font-bold">
-              Pedidos
-            </h2>
-
-            <p className="mt-3 text-zinc-400">
-              Ver pedidos de clientes.
-            </p>
+            Agregar Producto
           </Link>
 
           <Link
-            href="/admin/users"
-            className="rounded-3xl border border-white/10 bg-zinc-900 p-8 transition hover:border-amber-500"
+            href="/shop"
+            className="rounded-3xl bg-zinc-900 p-8 text-center text-xl font-bold transition hover:border hover:border-white"
           >
-            <h2 className="text-2xl font-bold">
-              Usuarios
-            </h2>
-
-            <p className="mt-3 text-zinc-400">
-              Administrar clientes.
-            </p>
+            Ver Tienda
           </Link>
 
         </div>

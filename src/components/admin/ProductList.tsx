@@ -59,12 +59,23 @@ export default function ProductList() {
 
           </div>
 
-          <button
-            onClick={() => remove(product.id)}
-            className="rounded-full bg-red-500 p-4 transition hover:scale-110"
-          >
-            <Trash2 />
-          </button>
+          <div className="flex gap-3">
+
+  <button
+    onClick={() => window.location.href = `/admin/products/${product.id}`}
+    className="rounded-xl bg-amber-500 px-5 py-3 font-bold text-black transition hover:scale-105"
+  >
+    Editar
+  </button>
+
+  <button
+    onClick={() => remove(product.id)}
+    className="rounded-xl bg-red-500 px-5 py-3 transition hover:scale-105"
+  >
+    <Trash2 />
+  </button>
+
+</div>
 
         </div>
 

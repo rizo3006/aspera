@@ -19,12 +19,24 @@ export default function ShopPage() {
           </h1>
 
           <p className="mt-4 max-w-xl text-zinc-400">
-            Descubre todas nuestras colecciones premium.
+            Descubre todas nuestras colecciones.
           </p>
 
         </div>
       </section>
+<section className="border-b border-white/10 bg-zinc-900 py-6">
+  <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-8 px-6 text-sm font-semibold text-zinc-300">
 
+    <span>🔥 Productos 100% Premium</span>
+
+    <span>👟 Tenis desde $1,500 MXN</span>
+
+    <span>🚚 Envíos a todo México</span>
+
+    <span>⭐ Calidad garantizada</span>
+
+  </div>
+</section>
       <FeaturedProducts />
 
       <Footer />

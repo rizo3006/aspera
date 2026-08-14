@@ -2,7 +2,11 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Heart, ShoppingBag } from "lucide-react";
+import {
+  Heart,
+  ShoppingBag,
+  Star,
+} from "lucide-react";
 import { toast } from "sonner";
 
 import { useCartStore } from "@/store/cartStore";
@@ -18,8 +22,10 @@ export default function FeaturedProducts() {
 
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("Todos");
+  const [sort, setSort] = useState("featured");
 
-  const filteredProducts = products.filter((product: any) => {
+  const filteredProducts = products
+  .filter((product: any) => {
     const matchesSearch = product.name
       .toLowerCase()
       .includes(search.toLowerCase());
@@ -28,7 +34,22 @@ export default function FeaturedProducts() {
       category === "Todos" || product.category === category;
 
     return matchesSearch && matchesCategory;
-  });
+})
+.sort((a: any, b: any) => {
+  switch (sort) {
+    case "price-low":
+      return a.price - b.price;
+
+    case "price-high":
+      return b.price - a.price;
+
+    case "name":
+      return a.name.localeCompare(b.name);
+
+    default:
+      return 0;
+  }
+});
 
   if (loading) {
     return (
@@ -60,10 +81,32 @@ export default function FeaturedProducts() {
         />
 
         <div className="mt-6 mb-12">
-          <CategoryFilter
-            selected={category}
-            setSelected={setCategory}
-          />
+          <div className="mt-6 flex justify-end">
+
+  <select
+    value={sort}
+    onChange={(e) => setSort(e.target.value)}
+    className="rounded-xl bg-zinc-900 px-5 py-3 text-white border border-white/10"
+  >
+    <option value="featured">
+      Destacados
+    </option>
+
+    <option value="price-low">
+      Precio ↑
+    </option>
+
+    <option value="price-high">
+      Precio ↓
+    </option>
+
+    <option value="name">
+      Nombre A-Z
+    </option>
+
+  </select>
+
+</div>
         </div>
 
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -112,9 +155,10 @@ export default function FeaturedProducts() {
                   onClick={(e) => {
                     e.preventDefault();
 
-                    toast("Añadido a favoritos", {
-                      description: product.name,
-                    });
+                   toast.success("Añadido a favoritos", {
+  description: product.name,
+  duration: 5000,
+});
                   }}
                   className="
                   absolute
@@ -133,26 +177,25 @@ export default function FeaturedProducts() {
                   <Heart className="h-5 w-5 text-white" />
                 </button>
 
-                {product.featured && (
+                <div className="absolute left-4 top-4 flex flex-col gap-2">
 
-                  <span
-                    className="
-                    absolute
-                    left-4
-                    top-4
-                    rounded-full
-                    bg-amber-500
-                    px-4
-                    py-1
-                    text-xs
-                    font-bold
-                    text-black
-                    "
-                  >
-                    NUEVO
-                  </span>
+  {product.featured && (
 
-                )}
+    <span className="rounded-full bg-amber-500 px-4 py-1 text-xs font-bold text-black">
+      NUEVO
+    </span>
+
+  )}
+
+  {product.comparePrice && (
+
+    <span className="rounded-full bg-red-500 px-4 py-1 text-xs font-bold text-white">
+      OFERTA
+    </span>
+
+  )}
+
+</div>
 
               </div>
 
@@ -188,31 +231,68 @@ export default function FeaturedProducts() {
                   {product.category}
                 </p>
 
-                <h3 className="mt-3 text-2xl font-black text-white">
-                  {product.name}
-                </h3>
+                <div className="mt-3 flex items-center gap-1">
 
-                <p className="mt-3 min-h-[50px] text-sm leading-6 text-zinc-400">
+  {[1, 2, 3, 4, 5].map((star) => (
+
+    <Star
+      key={star}
+      size={16}
+      className={
+        star <= product.rating
+          ? "fill-amber-400 text-amber-400"
+          : "text-zinc-600"
+      }
+    />
+
+  ))}
+
+  <span className="ml-2 text-xs text-zinc-500">
+    ({product.rating}.0)
+  </span>
+
+</div>
+
+                <p className="mt-3 line-clamp-2 min-h-[48px] text-sm leading-6 text-zinc-400">
                   {product.description}
                 </p>
 
                 <div className="mt-6">
 
-                  <div className="flex items-end gap-3">
+                  <div className="flex items-end justify-between">
 
-                    <span className="text-3xl font-black text-white">
-                      ${product.price}
-                    </span>
+  <div>
 
-                    {product.comparePrice && (
+    {product.comparePrice && (
 
-                      <span className="pb-1 text-sm text-zinc-500 line-through">
-                        ${product.comparePrice}
-                      </span>
+      <p className="text-sm text-zinc-500 line-through">
+        ${product.comparePrice}
+      </p>
 
-                    )}
+    )}
 
-                  </div>
+    <h3 className="text-3xl font-black text-white">
+      ${product.price}
+    </h3>
+
+  </div>
+
+  {product.comparePrice && (
+
+    <span className="rounded-full bg-red-500 px-3 py-1 text-xs font-bold text-white">
+
+      {Math.round(
+        ((product.comparePrice - product.price) /
+          product.comparePrice) *
+          100
+      )}
+      % OFF
+
+    </span>
+
+  )}
+
+</div>
 
                   {product.stock > 0 ? (
 
@@ -223,8 +303,9 @@ export default function FeaturedProducts() {
                         addToCart(product);
 
                         toast.success("Producto agregado", {
-                          description: product.name,
-                        });
+  description: product.name,
+  duration: 3000,
+});
                       }}
                       className="
                       mt-6
@@ -241,6 +322,7 @@ export default function FeaturedProducts() {
                       transition-all
                       duration-300
                       hover:bg-amber-500
+                      hover:scale-[1.02]
                       hover:shadow-xl
                       hover:shadow-amber-500/20
                       active:scale-95

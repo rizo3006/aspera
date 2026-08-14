@@ -5,6 +5,8 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 
 import { getProductBySlug } from "@/services/getProductBySlug";
+import ProductActions from "@/components/shop/ProductActions";
+
 interface Props {
   params: Promise<{
     slug: string;
@@ -12,13 +14,13 @@ interface Props {
 }
 
 export default async function ProductPage({ params }: Props) {
- const { slug } = await params;
+  const { slug } = await params;
 
-const product: any = await getProductBySlug(slug);
+  const product: any = await getProductBySlug(slug);
 
-if (!product) {
-  notFound();
-}
+  if (!product) {
+    notFound();
+  }
 
   return (
     <>
@@ -28,17 +30,19 @@ if (!product) {
 
         <div className="grid gap-16 lg:grid-cols-2">
 
+          {/* Imagen */}
           <div className="relative aspect-square overflow-hidden rounded-3xl bg-zinc-900">
 
             <Image
               src={product.image}
               alt={product.name}
               fill
-              className="object-cover"
+              className="object-cover transition duration-500 hover:scale-110"
             />
 
           </div>
 
+          {/* Información */}
           <div>
 
             <p className="uppercase tracking-[0.35em] text-amber-500">
@@ -49,43 +53,130 @@ if (!product) {
               {product.name}
             </h1>
 
-            <p className="mt-8 text-zinc-400 leading-8">
+            <div className="mt-6 flex items-center gap-2 text-xl text-amber-400">
+              ★★★★★
+
+              <span className="ml-2 text-sm text-zinc-400">
+                ({product.rating}/5)
+              </span>
+            </div>
+
+            <p className="mt-8 leading-8 text-zinc-400">
               {product.description}
             </p>
-<div className="mt-8 flex items-center gap-3">
 
-  <span
-    className={`rounded-full px-4 py-2 text-sm font-semibold ${
-      product.stock > 0
-        ? "bg-green-500/20 text-green-400"
-        : "bg-red-500/20 text-red-400"
-    }`}
-  >
-    {product.stock > 0
-      ? `${product.stock} disponibles`
-      : "Agotado"}
-  </span>
+            <div className="mt-8 flex items-center gap-3">
 
-  {product.featured && (
-    <span className="rounded-full bg-amber-500 px-4 py-2 text-sm font-bold text-black">
-      Destacado
-    </span>
-  )}
+              <span
+                className={`rounded-full px-4 py-2 text-sm font-semibold ${
+                  product.stock > 0
+                    ? "bg-green-500/20 text-green-400"
+                    : "bg-red-500/20 text-red-400"
+                }`}
+              >
+                {product.stock > 0
+                  ? `${product.stock} disponibles`
+                  : "Agotado"}
+              </span>
 
-</div>
-            <p className="mt-10 text-5xl font-black">
-              ${product.price}
-            </p>
+              {product.featured && (
+                <span className="rounded-full bg-amber-500 px-4 py-2 text-sm font-bold text-black">
+                  Destacado
+                </span>
+              )}
 
-            <div className="mt-10 flex gap-5">
+            </div>
 
-              <button className="rounded-full bg-white px-10 py-4 font-bold text-black transition hover:scale-105">
+            {/* Precio */}
+            <div className="mt-10">
+
+              <div className="flex items-end gap-5">
+
+                <span className="text-5xl font-black">
+                  ${Number(product.price).toLocaleString()}
+                </span>
+
+                {product.comparePrice > 0 && (
+
+                  <span className="pb-2 text-2xl text-zinc-500 line-through">
+                    ${Number(product.comparePrice).toLocaleString()}
+                  </span>
+
+                )}
+
+              </div>
+
+              {product.comparePrice > product.price && (
+
+                <p className="mt-3 text-green-400">
+
+                  Ahorras $
+
+                  {Number(
+                    product.comparePrice - product.price
+                  ).toLocaleString()}
+
+                </p>
+
+              )}
+
+            </div>
+
+            {/* Botones */}
+            <div className="mt-10 space-y-4">
+
+              <button
+                className="
+                w-full
+                rounded-2xl
+                bg-white
+                py-5
+                text-lg
+                font-black
+                text-black
+                transition
+                hover:scale-[1.02]
+                "
+              >
                 Agregar al carrito
               </button>
 
-              <button className="rounded-full border border-white/20 px-10 py-4 transition hover:bg-white hover:text-black">
+              <button
+                className="
+                w-full
+                rounded-2xl
+                bg-amber-500
+                py-5
+                text-lg
+                font-black
+                text-black
+                transition
+                hover:scale-[1.02]
+                "
+              >
                 Comprar ahora
               </button>
+
+            </div>
+
+            {/* Información extra */}
+            <div className="mt-12 rounded-3xl border border-white/10 bg-zinc-900 p-8">
+
+              <h3 className="text-xl font-bold">
+                Información
+              </h3>
+
+              <div className="mt-6 space-y-3 text-zinc-400">
+
+                <p>✔ Envíos a todo México</p>
+
+                <p>✔ Pago seguro</p>
+
+                <p>✔ Garantía de satisfacción</p>
+
+                <p>✔ Productos 100% originales</p>
+
+              </div>
 
             </div>
 
@@ -96,6 +187,7 @@ if (!product) {
       </section>
 
       <Footer />
+
     </>
   );
 }
