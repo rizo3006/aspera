@@ -42,8 +42,9 @@ export default function Hero() {
           <div className="mt-8 h-[2px] w-28 rounded-full bg-amber-400" />
 
           <p className="mt-8 max-w-lg text-lg leading-8 text-zinc-400">
-            Diseños premium inspirados en la fe.
-            Calidad, elegancia y propósito en cada colección.
+    
+            Calidad, Elegancia y Propósito en cada colección.
+            Productos seleccionados para quienes buscan destacar con estilo y autenticidad.
           </p>
 
           <div className="mt-10 flex gap-4">

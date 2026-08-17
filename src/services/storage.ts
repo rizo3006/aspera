@@ -6,27 +6,42 @@ import {
 
 import { storage } from "@/firebase/config";
 
-export async function uploadImage(file: File) {
+export async function uploadImage(
+  file: File
+): Promise<string> {
   if (!file) {
-    throw new Error("No se seleccionó ninguna imagen");
+    throw new Error("No se recibió ninguna imagen");
   }
 
-  const fileName = `${Date.now()}-${file.name}`;
+  const extension =
+    file.name.split(".").pop() || "jpg";
+
+  const fileName = `${Date.now()}-${Math.random()
+    .toString(36)
+    .substring(2, 10)}.${extension}`;
 
   const storageRef = ref(
     storage,
     `products/${fileName}`
   );
 
-  console.log("Subiendo imagen:", file.name);
+  console.log("📤 Subiendo imagen a Firebase Storage...");
+  console.log("Archivo:", file.name);
+  console.log("Tamaño:", file.size);
+  console.log("Ruta:", `products/${fileName}`);
 
-  await uploadBytes(storageRef, file);
+  const snapshot = await uploadBytes(
+    storageRef,
+    file
+  );
 
-  console.log("Imagen subida correctamente");
+  console.log("✅ Imagen subida");
 
-  const url = await getDownloadURL(storageRef);
+  const url = await getDownloadURL(
+    snapshot.ref
+  );
 
-  console.log("URL obtenida:", url);
+  console.log("✅ URL obtenida:", url);
 
   return url;
 }

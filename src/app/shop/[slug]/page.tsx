@@ -123,41 +123,7 @@ export default async function ProductPage({ params }: Props) {
             </div>
 
             {/* Botones */}
-            <div className="mt-10 space-y-4">
-
-              <button
-                className="
-                w-full
-                rounded-2xl
-                bg-white
-                py-5
-                text-lg
-                font-black
-                text-black
-                transition
-                hover:scale-[1.02]
-                "
-              >
-                Agregar al carrito
-              </button>
-
-              <button
-                className="
-                w-full
-                rounded-2xl
-                bg-amber-500
-                py-5
-                text-lg
-                font-black
-                text-black
-                transition
-                hover:scale-[1.02]
-                "
-              >
-                Comprar ahora
-              </button>
-
-            </div>
+           <ProductActions product={product} />
 
             {/* Información extra */}
             <div className="mt-12 rounded-3xl border border-white/10 bg-zinc-900 p-8">

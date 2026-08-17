@@ -3,12 +3,10 @@
 import { useState } from "react";
 import { addDoc, collection } from "firebase/firestore";
 import { db } from "@/firebase/config";
-import { uploadImage } from "@/services/storage";
 import { toast } from "sonner";
 
 interface ProductRow {
   name: string;
-  slug: string;
   description: string;
   price: string;
   comparePrice: string;
@@ -19,14 +17,12 @@ interface ProductRow {
   stock: string;
   rating: string;
   featured: boolean;
-  imageFile: File | null;
-  preview: string;
+  image: string;
 }
 
 function createProduct(): ProductRow {
   return {
     name: "",
-    slug: "",
     description: "",
     price: "",
     comparePrice: "",
@@ -37,8 +33,7 @@ function createProduct(): ProductRow {
     stock: "1",
     rating: "5",
     featured: false,
-    imageFile: null,
-    preview: "",
+    image: "",
   };
 }
 
@@ -65,7 +60,7 @@ export default function ImportProductsPage() {
   function updateProduct(
     index: number,
     field: keyof ProductRow,
-    value: string | boolean | File | null
+    value: string | boolean
   ) {
     setProducts((current) =>
       current.map((product, i) =>
@@ -79,153 +74,125 @@ export default function ImportProductsPage() {
     );
   }
 
-  function handleImage(
-    index: number,
-    file: File | null
-  ) {
-    if (!file) return;
-
-    const preview = URL.createObjectURL(file);
-
-    setProducts((current) =>
-      current.map((product, i) =>
-        i === index
-          ? {
-              ...product,
-              imageFile: file,
-              preview,
-            }
-          : product
-      )
-    );
-  }
-
   async function handleImport() {
-  if (products.length === 0) {
-    toast.error("No hay productos");
-    return;
-  }
-
-  for (const product of products) {
-    if (!product.name) {
-      toast.error("Falta el nombre de un producto");
+    if (products.length === 0) {
+      toast.error("No hay productos");
       return;
     }
 
-    if (!product.price) {
-      toast.error(
-        `Falta el precio de ${product.name}`
-      );
-      return;
+    for (const product of products) {
+      if (!product.name.trim()) {
+        toast.error("Falta el nombre de un producto");
+        return;
+      }
+
+      if (!product.price) {
+        toast.error(
+          `Falta el precio de ${product.name}`
+        );
+        return;
+      }
+
+      if (!product.image.trim()) {
+        toast.error(
+          `Falta la imagen de ${product.name}`
+        );
+        return;
+      }
     }
 
-    if (!product.imageFile) {
-      toast.error(
-        `Falta la imagen de ${product.name}`
-      );
-      return;
-    }
-  }
+    setLoading(true);
 
-  setLoading(true);
+    try {
+      for (let i = 0; i < products.length; i++) {
+        const product = products[i];
 
-  try {
-    console.log(
-      `Iniciando subida de ${products.length} productos`
-    );
-
-    for (let i = 0; i < products.length; i++) {
-      const product = products[i];
-
-      console.log(
-        `Subiendo producto ${i + 1}/${products.length}:`,
-        product.name
-      );
-
-      // Subir imagen
-      const imageUrl = await uploadImage(
-        product.imageFile!
-      );
-
-      console.log(
-        "Imagen subida:",
-        imageUrl
-      );
-
-      // Crear producto en Firestore
-      await addDoc(collection(db, "products"), {
-        name: product.name,
-
-        slug:
-          product.slug ||
+        console.log(
+          `Guardando producto ${i + 1}/${products.length}:`,
           product.name
-            .toLowerCase()
-            .trim()
-            .replace(/\s+/g, "-")
-            .replace(/[^\w-]/g, ""),
+        );
 
-        description: product.description,
+        const slug = product.name
+          .toLowerCase()
+          .trim()
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/^-+|-+$/g, "");
 
-        price: Number(product.price),
+        await addDoc(collection(db, "products"), {
+          name: product.name.trim(),
 
-        comparePrice: Number(
-          product.comparePrice || 0
-        ),
+          slug,
 
-        category: product.category,
+          description:
+            product.description.trim(),
 
-        type: product.type,
+          price: Number(product.price),
 
-        brand: product.brand,
+          comparePrice:
+            Number(product.comparePrice) || 0,
 
-        image: imageUrl,
+          category:
+            product.category,
 
-        featured: product.featured,
+          type:
+            product.type.trim(),
 
-        stock: Number(
-          product.stock || 0
-        ),
+          brand:
+            product.brand.trim(),
 
-        rating: Number(
-          product.rating || 5
-        ),
-      });
+          gender:
+            product.gender,
 
-      console.log(
-        `Producto ${i + 1} guardado correctamente`
+          image:
+            product.image.trim(),
+
+          featured:
+            product.featured,
+
+          stock:
+            Number(product.stock) || 0,
+
+          rating:
+            Number(product.rating) || 5,
+
+          createdAt:
+            new Date().toISOString(),
+        });
+
+        console.log(
+          `Producto guardado: ${product.name}`
+        );
+      }
+
+      toast.success(
+        `${products.length} producto${
+          products.length === 1 ? "" : "s"
+        } agregado${
+          products.length === 1 ? "" : "s"
+        } correctamente`
       );
+
+      setProducts([createProduct()]);
+    } catch (error) {
+      console.error(
+        "ERROR AL GUARDAR PRODUCTOS:",
+        error
+      );
+
+      toast.error(
+        "No se pudieron guardar los productos."
+      );
+    } finally {
+      setLoading(false);
     }
-
-    toast.success(
-      `${products.length} producto${
-        products.length === 1 ? "" : "s"
-      } agregado${
-        products.length === 1 ? "" : "s"
-      } correctamente`
-    );
-
-    setProducts([createProduct()]);
-
-  } catch (error) {
-    console.error(
-      "ERROR AL SUBIR PRODUCTOS:",
-      error
-    );
-
-    toast.error(
-      "No se pudieron subir los productos. Revisa la consola."
-    );
-
-  } finally {
-    setLoading(false);
   }
-}
+
   return (
     <main className="min-h-screen bg-black px-6 py-32 text-white">
 
       <div className="mx-auto max-w-7xl">
-
-        {/* ENCABEZADO */}
 
         <div className="mb-12 flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
 
@@ -253,8 +220,6 @@ export default function ImportProductsPage() {
 
         </div>
 
-        {/* PRODUCTOS */}
-
         <div className="space-y-8">
 
           {products.map((product, index) => (
@@ -263,8 +228,6 @@ export default function ImportProductsPage() {
               key={index}
               className="rounded-3xl border border-white/10 bg-zinc-950 p-6"
             >
-
-              {/* TITULO */}
 
               <div className="mb-6 flex items-center justify-between">
 
@@ -278,7 +241,7 @@ export default function ImportProductsPage() {
                     onClick={() =>
                       removeProduct(index)
                     }
-                    className="rounded-lg bg-red-600 px-4 py-2 text-sm font-bold transition hover:bg-red-500"
+                    className="rounded-lg bg-red-600 px-4 py-2 text-sm font-bold"
                   >
                     Eliminar
                   </button>
@@ -292,44 +255,37 @@ export default function ImportProductsPage() {
 
                 <div className="lg:row-span-2">
 
-                  <label className="block text-sm font-semibold text-zinc-300">
-                    Imagen *
+                  <label className="text-sm text-zinc-400">
+                    Ruta de imagen *
                   </label>
 
-                  <label className="mt-2 flex aspect-square cursor-pointer items-center justify-center overflow-hidden rounded-2xl border border-dashed border-white/20 bg-zinc-900">
+                  <input
+                    value={product.image}
+                    onChange={(e) =>
+                      updateProduct(
+                        index,
+                        "image",
+                        e.target.value
+                      )
+                    }
+                    placeholder="/products/nike-air-max.jpg"
+                    className="mt-2 w-full rounded-xl bg-zinc-900 p-4"
+                  />
 
-                    {product.preview ? (
+                  {product.image && (
+                    <div className="mt-4 overflow-hidden rounded-2xl bg-zinc-900">
                       <img
-                        src={product.preview}
+                        src={product.image}
                         alt={product.name}
-                        className="h-full w-full object-cover"
+                        className="h-64 w-full object-cover"
                       />
-                    ) : (
-                      <div className="text-center text-zinc-500">
-                        <p className="text-4xl">
-                          +
-                        </p>
+                    </div>
+                  )}
 
-                        <p className="mt-2 text-sm">
-                          Seleccionar imagen
-                        </p>
-                      </div>
-                    )}
-
-                    <input
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={(e) =>
-                        handleImage(
-                          index,
-                          e.target.files?.[0] ||
-                            null
-                        )
-                      }
-                    />
-
-                  </label>
+                  <p className="mt-3 text-xs text-zinc-500">
+                    La imagen debe estar dentro de
+                    public/products
+                  </p>
 
                 </div>
 
@@ -349,8 +305,8 @@ export default function ImportProductsPage() {
                         e.target.value
                       )
                     }
-                    placeholder="Nike Jordan 1"
-                    className="mt-2 w-full rounded-xl bg-zinc-900 p-4 outline-none focus:ring-2 focus:ring-amber-500"
+                    placeholder="Nike Air Max"
+                    className="mt-2 w-full rounded-xl bg-zinc-900 p-4"
                   />
                 </div>
 
@@ -371,11 +327,11 @@ export default function ImportProductsPage() {
                       )
                     }
                     placeholder="Nike"
-                    className="mt-2 w-full rounded-xl bg-zinc-900 p-4 outline-none focus:ring-2 focus:ring-amber-500"
+                    className="mt-2 w-full rounded-xl bg-zinc-900 p-4"
                   />
                 </div>
 
-                {/* TIPO */}
+                {/* MODELO */}
 
                 <div>
                   <label className="text-sm text-zinc-400">
@@ -391,8 +347,8 @@ export default function ImportProductsPage() {
                         e.target.value
                       )
                     }
-                    placeholder="Jordan 1"
-                    className="mt-2 w-full rounded-xl bg-zinc-900 p-4 outline-none focus:ring-2 focus:ring-amber-500"
+                    placeholder="Air Max"
+                    className="mt-2 w-full rounded-xl bg-zinc-900 p-4"
                   />
                 </div>
 
@@ -565,8 +521,6 @@ export default function ImportProductsPage() {
 
         </div>
 
-        {/* BOTON SUBIR */}
-
         <div className="mt-10 flex justify-end">
 
           <button
@@ -576,8 +530,8 @@ export default function ImportProductsPage() {
             className="rounded-2xl bg-amber-500 px-10 py-5 text-lg font-black text-black transition hover:bg-amber-400 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {loading
-              ? "Subiendo productos..."
-              : `Subir ${products.length} producto${
+              ? "Guardando productos..."
+              : `Guardar ${products.length} producto${
                   products.length === 1
                     ? ""
                     : "s"
