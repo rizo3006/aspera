@@ -1,28 +1,34 @@
 import {
   collection,
   getDocs,
-  query,
-  orderBy,
 } from "firebase/firestore";
 
 import { db } from "@/firebase/config";
 
 export async function getProducts() {
-  const q = query(
-    collection(db, "products"),
-    orderBy("featured", "desc")
-  );
+  try {
+    console.log("🔎 Consultando Firestore...");
 
-  const snapshot = await getDocs(q);
+    const snapshot = await getDocs(
+      collection(db, "products")
+    );
 
-  const products = snapshot.docs.map((doc) => ({
-    id: doc.id,
-    ...doc.data(),
-  }));
+    const products = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
 
-  return products.sort((a: any, b: any) => {
-    if (a.stock === 0 && b.stock > 0) return 1;
-    if (b.stock === 0 && a.stock > 0) return -1;
-    return 0;
-  });
+    console.log(
+      `✅ Firestore devolvió ${products.length} productos`
+    );
+
+    return products;
+  } catch (error) {
+    console.error(
+      "❌ Error consultando Firestore:",
+      error
+    );
+
+    throw error;
+  }
 }
